@@ -1,0 +1,32 @@
+name: S&P 400 MidCap Daily Scanner
+
+on:
+  schedule:
+    # Uruchamia się od poniedziałku do piątku o 22:45 UTC
+    - cron: '45 22 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  scan_and_report_sp400:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install yfinance pandas lxml pandas-ta requests html5lib
+          
+      - name: Run Market Analysis (S&P 400)
+        env:
+          EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
+        run: python SP400_scan.py
